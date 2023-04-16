@@ -7,6 +7,7 @@ import { percentage } from "../../Utis/functions/perecntage"
 import { NumericFormat , PatternFormat } from "react-number-format"
 import Market from "../market"
 import { Link } from "react-router-dom"
+import Loading from "../loading"
 
 export default function Column(){
     useEffect(
@@ -16,10 +17,13 @@ export default function Column(){
     )
     const [row , setRow] = useState([])
     const [ofset , setOfset] = useState(20)
+    const [loading , setLoading] = useState(false)
     
     async function assets(){
+        setLoading(false)
         const response = await instance.get("assets" ,  {params:{limit:20}})
         setRow(response.data.data)
+        setLoading(true)
     }
     function render(){
         return row.map(function(item){
@@ -75,8 +79,9 @@ export default function Column(){
         setRow(current=> [ ...current, ...more.data.data])
         console.log(more.data.data)
     }
-    return(
+    return(  
         <Style>
+            {loading === false ? <Loading/> :
             <div className="container">
             <Market/>
                 <table>
@@ -108,9 +113,7 @@ export default function Column(){
                         </th>
                     </tr>
                     </thead>
-                    
                 <tbody>
-               
                 {render()}
                 </tbody>
                 </table>
@@ -118,8 +121,11 @@ export default function Column(){
                 <button onClick={showMore}>
                     View More
                 </button>
+                
                 </div>
                     </div>
+        }
             </Style>
+    
     )
 }
