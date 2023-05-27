@@ -2,48 +2,50 @@ import { Fragment , useEffect, useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import instance from "../../../../../Utis/reguest";
+import { Link } from "react-router-dom";
+import { useRef } from "react";
 export default function Search(){
+    
+    const[vis, setVis] = useState(false)
+    const [searches , setSearches] = useState([]) 
     useEffect(
         function(){
             inputOnchange()
         }
-        , [] )
-    const[vis, setVis] = useState(false)
-    const [searches , setSearches] = useState([])    
+        , [searches] )  
     function makeInput(event){
-        setVis( current => !current)
+        setVis(!vis)
         console.log("hello")
     }
     async function inputOnchange(e){
-        const response = await instance.get("assets" )
+        const response = await instance.get(`assets` , {params:{search : e?.target.value}})
         setSearches(response.data.data)
     }
     function renderFarm(){
         return searches.map(function(item){
             const{name,id,symbol} = item
             return(
-                <>
-                <option key={id}>
-                    <p>
-                        {id}
-                    </p>
-                    <p>
-                        {symbol}
-                    </p>
-                    <p>
-                        {name}
-                    </p>
-                </option>
-                </>
+                <li key={id}>
+                    <Link to={`assets/${id}`}>
+                        {id}({symbol})
+                    </Link>
+                </li>
+               
             )
         })
     }
     return(
         <Fragment>
-            <input  type="text" list="searching" className={`show ${vis ? 'see' : ' '}`} />
-            <datalist id="searching">
+            <input onChange={inputOnchange} type="text" list="searching" className={`show ${vis ? 'see' : ' '}`}  />
+            {vis ? 
+            <ul id="searching">
                     {renderFarm()}
-            </datalist>
+            </ul>
+            :
+            <>
+            </>
+            }
+            
             <div className="search" onClick ={()=> makeInput()}>
                 <FontAwesomeIcon icon={faMagnifyingGlass}   />
             </div>

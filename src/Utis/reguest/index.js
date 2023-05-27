@@ -5,4 +5,3 @@ import axios from "axios"
         timeout: 1000,
     });
     export default instance
-
